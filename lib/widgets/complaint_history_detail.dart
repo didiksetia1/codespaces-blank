@@ -1,35 +1,19 @@
 import 'package:flutter/material.dart';
 
-class ComplaintHistoryEntry {
-  const ComplaintHistoryEntry({
-    required this.title,
-    required this.category,
-    required this.status,
-    required this.dateLabel,
-    required this.description,
-    required this.activeStep,
-  });
-
-  final String title;
-  final String category;
-  final String status;
-  final String dateLabel;
-  final String description;
-  final int activeStep;
-}
+import '../models/aduan_history.dart';
 
 class ComplaintHistoryDetail extends StatelessWidget {
   const ComplaintHistoryDetail({required this.entry, super.key});
 
-  final ComplaintHistoryEntry entry;
+  final AduanHistoryEntry entry;
 
   @override
   Widget build(BuildContext context) {
     final List<_TimelineStage> stages = <_TimelineStage>[
-      const _TimelineStage(label: 'Dikirim', dateLabel: '06 May 2026, 09:02'),
-      const _TimelineStage(label: 'Ditinjau'),
-      const _TimelineStage(label: 'Diproses'),
-      const _TimelineStage(label: 'Selesai'),
+      _TimelineStage(label: 'Dikirim', dateLabel: entry.timelineDateLabelFor(0)),
+      _TimelineStage(label: 'Ditinjau', dateLabel: entry.timelineDateLabelFor(1)),
+      _TimelineStage(label: 'Diproses', dateLabel: entry.timelineDateLabelFor(2)),
+      _TimelineStage(label: 'Selesai', dateLabel: entry.timelineDateLabelFor(3)),
     ];
 
     return Container(
@@ -62,7 +46,7 @@ class ComplaintHistoryDetail extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  entry.status,
+                  entry.statusLabel,
                   style: const TextStyle(
                     color: Color(0xFF0F8BD5),
                     fontWeight: FontWeight.w800,
@@ -125,9 +109,41 @@ class ComplaintHistoryDetail extends StatelessWidget {
               height: 1.5,
             ),
           ),
+          if (entry.tanggapan != null && entry.tanggapan!.trim().isNotEmpty) ...<Widget>[
+            const SizedBox(height: 18),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF2F4F8),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFFD7DEE8)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  const Text(
+                    'Tanggapan',
+                    style: TextStyle(
+                      color: Color(0xFF6D7280),
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    entry.tanggapan!.trim(),
+                    style: const TextStyle(
+                      color: Color(0xFF4B5563),
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           const Spacer(),
           Text(
-            'Dikirim pada: ${entry.dateLabel}',
+            'Dikirim pada: ${entry.createdAtLabel}',
             style: const TextStyle(
               color: Color(0xFFC08D8D),
               fontSize: 14,

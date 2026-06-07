@@ -1,4 +1,7 @@
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
+
+import '../services/aduan_service.dart';
 
 class AduanCreatePage extends StatefulWidget {
   const AduanCreatePage({super.key});
@@ -10,6 +13,8 @@ class AduanCreatePage extends StatefulWidget {
 }
 
 class _AduanCreatePageState extends State<AduanCreatePage> {
+  final ImagePicker _imagePicker = ImagePicker();
+  final AduanService _aduanService = AduanService();
   final TextEditingController _judulController = TextEditingController();
   final TextEditingController _isiController = TextEditingController();
   final List<String> _categories = <String>[
@@ -19,6 +24,8 @@ class _AduanCreatePageState extends State<AduanCreatePage> {
     'Layanan Kampus',
   ];
   String? _selectedCategory;
+  XFile? _selectedImage;
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -27,7 +34,20 @@ class _AduanCreatePageState extends State<AduanCreatePage> {
     super.dispose();
   }
 
-  void _submitComplaint() {
+  Future<void> _pickImage() async {
+    final XFile? image = await _imagePicker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 85,
+    );
+
+    if (image == null || !mounted) return;
+
+    setState(() {
+      _selectedImage = image;
+    });
+  }
+
+  Future<void> _submitComplaint() async {
     final String category = _selectedCategory ?? '';
     final String judul = _judulController.text.trim();
     final String isi = _isiController.text.trim();
@@ -39,9 +59,42 @@ class _AduanCreatePageState extends State<AduanCreatePage> {
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Aduan berhasil dikirim.')),
-    );
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      await _aduanService.createComplaint(
+        kategori: category,
+        judul: judul,
+        deskripsi: isi,
+        imageFile: _selectedImage,
+      );
+
+      if (!mounted) return;
+
+      _judulController.clear();
+      _isiController.clear();
+      setState(() {
+        _selectedCategory = null;
+        _selectedImage = null;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Aduan berhasil dikirim.')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal mengirim aduan: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
   }
 
   @override
@@ -137,15 +190,58 @@ class _AduanCreatePageState extends State<AduanCreatePage> {
                         const SizedBox(height: 8),
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: const Color(0xFFF3D1D1)),
                           ),
-                          child: const Text(
-                            'Choose File   No file chosen',
-                            style: TextStyle(color: Color(0xFF8A4A4A)),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Text(
+                                      _selectedImage == null ? 'Belum ada gambar dipilih' : _selectedImage!.name,
+                                      style: const TextStyle(color: Color(0xFF8A4A4A)),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  TextButton.icon(
+                                    onPressed: _isSubmitting ? null : _pickImage,
+                                    icon: const Icon(Icons.image_outlined),
+                                    label: const Text('Pilih Gambar'),
+                                  ),
+                                ],
+                              ),
+                              if (_selectedImage != null) ...<Widget>[
+                                const SizedBox(height: 12),
+                                Container(
+                                  width: double.infinity,
+                                  height: 180,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    color: const Color(0xFFF9FAFB),
+                                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                                  ),
+                                  child: const Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Icon(Icons.image_outlined, color: Color(0xFF9CA3AF), size: 40),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          'Gambar siap diupload',
+                                          style: TextStyle(color: Color(0xFF6B7280)),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -153,7 +249,7 @@ class _AduanCreatePageState extends State<AduanCreatePage> {
                           width: double.infinity,
                           height: 56,
                           child: ElevatedButton(
-                            onPressed: _submitComplaint,
+                            onPressed: _isSubmitting ? null : _submitComplaint,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFB91C1C),
                               foregroundColor: Colors.white,
@@ -161,10 +257,19 @@ class _AduanCreatePageState extends State<AduanCreatePage> {
                                 borderRadius: BorderRadius.circular(16),
                               ),
                             ),
-                            child: const Text(
-                              'Kirim Pengaduan',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
-                            ),
+                            child: _isSubmitting
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                    ),
+                                  )
+                                : const Text(
+                                    'Kirim Pengaduan',
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                                  ),
                           ),
                         ),
                       ],
