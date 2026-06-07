@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/agenda.dart';
 
 class AgendaListCard extends StatelessWidget {
-  const AgendaListCard({required this.agenda, required this.onTap, Key? key}) : super(key: key);
+  const AgendaListCard({required this.agenda, required this.onTap, super.key});
 
   final Agenda agenda;
   final VoidCallback onTap;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ErrorState extends StatelessWidget {
-  const ErrorState({required this.message, required this.onRetry, Key? key}) : super(key: key);
+  const ErrorState({required this.message, required this.onRetry, super.key});
 
   final String message;
   final Future<void> Function() onRetry;
@@ -45,7 +45,7 @@ class ErrorState extends StatelessWidget {
 }
 
 class EmptyState extends StatelessWidget {
-  const EmptyState({required this.onRetry, Key? key}) : super(key: key);
+  const EmptyState({required this.onRetry, super.key});
 
   final Future<void> Function() onRetry;
 
@@ -90,7 +90,7 @@ class EmptyState extends StatelessWidget {
 }
 
 class InlineMessage extends StatelessWidget {
-  const InlineMessage({required this.message, required this.onRetry, Key? key}) : super(key: key);
+  const InlineMessage({required this.message, required this.onRetry, super.key});
 
   final String message;
   final Future<void> Function() onRetry;

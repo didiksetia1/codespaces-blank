@@ -221,7 +221,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   // Faculty Dropdown
                   DropdownButtonFormField<String>(
-                    value: _selectedFaculty,
+                    initialValue: _selectedFaculty,
                     items: _faculties
                         .map((f) => DropdownMenuItem(
                               value: f,
@@ -248,7 +248,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   // Program Dropdown
                   DropdownButtonFormField<String>(
-                    value: _selectedProgram,
+                    initialValue: _selectedProgram,
                     items: (_selectedFaculty != null
                             ? _programs[_selectedFaculty] ?? []
                             : <String>[])

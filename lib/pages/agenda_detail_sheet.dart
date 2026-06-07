@@ -5,7 +5,7 @@ import '../services/agenda_service.dart';
 import '../widgets/agenda_states.dart';
 
 class AgendaDetailSheet extends StatefulWidget {
-  const AgendaDetailSheet({required this.agendaService, required this.agenda, required this.onChanged, Key? key}) : super(key: key);
+  const AgendaDetailSheet({required this.agendaService, required this.agenda, required this.onChanged, super.key});
 
   final AgendaService agendaService;
   final Agenda agenda;

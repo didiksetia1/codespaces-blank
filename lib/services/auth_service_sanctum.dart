@@ -13,7 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SanctumAuthService {
   static const String _tokenKey = 'auth_token';
   static const String apiBaseUrl =
-  'http://202.10.44.249/';
+  'http://202.10.44.249';
 
   final String baseUrl;
   final http.Client _client;

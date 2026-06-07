@@ -294,7 +294,7 @@ class _AspirasiPageState extends State<AspirasiPage> {
               StatefulBuilder(
                 builder: (context, setDropdownState) {
                   return DropdownButtonFormField<String>(
-                    value: selectedCategory,
+                    initialValue: selectedCategory,
                     items: [
                       '-- Pilih Kategori --',
                       'Akademik',
