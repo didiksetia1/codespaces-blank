@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 
@@ -218,26 +220,37 @@ class _AduanCreatePageState extends State<AduanCreatePage> {
                               ),
                               if (_selectedImage != null) ...<Widget>[
                                 const SizedBox(height: 12),
-                                Container(
-                                  width: double.infinity,
-                                  height: 180,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    color: const Color(0xFFF9FAFB),
-                                    border: Border.all(color: const Color(0xFFE5E7EB)),
-                                  ),
-                                  child: const Center(
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: <Widget>[
-                                        Icon(Icons.image_outlined, color: Color(0xFF9CA3AF), size: 40),
-                                        SizedBox(height: 8),
-                                        Text(
-                                          'Gambar siap diupload',
-                                          style: TextStyle(color: Color(0xFF6B7280)),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.file(
+                                    File(_selectedImage!.path),
+                                    width: double.infinity,
+                                    height: 180,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        width: double.infinity,
+                                        height: 180,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(12),
+                                          color: const Color(0xFFF9FAFB),
+                                          border: Border.all(color: const Color(0xFFE5E7EB)),
                                         ),
-                                      ],
-                                    ),
+                                        child: const Center(
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: <Widget>[
+                                              Icon(Icons.broken_image_outlined, color: Color(0xFF9CA3AF), size: 40),
+                                              SizedBox(height: 8),
+                                              Text(
+                                                'Gagal memuat gambar',
+                                                style: TextStyle(color: Color(0xFF6B7280)),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ),
                               ],

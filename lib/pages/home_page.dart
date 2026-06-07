@@ -138,7 +138,7 @@ class _HomePageState extends State<HomePage> {
                             icon: Icons.record_voice_over_outlined,
                             title: 'Aspirasi',
                             subtitle: 'Lihat suara',
-                            destination: null,
+                            destination: AspirasiPage.routeName,
                           ),
                         ),
                       ],

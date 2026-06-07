@@ -8,6 +8,7 @@ import 'pages/aspirasi_page.dart';
 import 'pages/home_page.dart';
 import 'pages/login_page.dart';
 import 'pages/register_page.dart';
+import 'pages/aspirasi_detail_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -51,6 +52,10 @@ class MyApp extends StatelessWidget {
         AduanHistoryPage.routeName: (BuildContext context) => const AduanHistoryPage(),
         AgendaPage.routeName: (BuildContext context) => const AgendaPage(),
         AspirasiPage.routeName: (BuildContext context) => const AspirasiPage(),
+        AspirasiDetailPage.routeName: (BuildContext context) {
+          final args = ModalRoute.of(context)!.settings.arguments as String;
+          return AspirasiDetailPage(aspirasiId: args);
+        },
       },
     );
   }
