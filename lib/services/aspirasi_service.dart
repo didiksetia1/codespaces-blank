@@ -177,7 +177,7 @@ class AspirasiService {
       'deskripsi': deskripsi,
       if (tujuanManfaat != null && tujuanManfaat.isNotEmpty)
         'tujuan_manfaat': tujuanManfaat,
-      'anonim': anonim.toString(),
+      'anonim': anonim ? '1' : '0',
     });
 
     if (imageFile != null) {
