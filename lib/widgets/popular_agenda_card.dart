@@ -1,95 +1,143 @@
 import 'package:flutter/material.dart';
 
 import '../models/agenda_item.dart';
-import 'stat_chip.dart';
 
 class PopularAgendaCard extends StatelessWidget {
-  const PopularAgendaCard({required this.agenda, super.key});
+  const PopularAgendaCard({required this.agenda, this.onTap, super.key});
 
   final AgendaItem agenda;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: <Color>[Color(0xFFB91C1C), Color(0xFF7F1D1D)],
-        ),
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: const Color(0xFF7F1D1D).withValues(alpha: 0.20),
-            blurRadius: 24,
-            offset: const Offset(0, 14),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.all(22),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFFB91C1C), Color(0xFF991B1B)],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(999),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFB91C1C).withOpacity(0.2),
+              blurRadius: 30,
+              offset: const Offset(0, 15),
             ),
-            child: const Text(
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Section title
+            Text(
               'Sedang Hangat Dibicarakan',
               style: TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
+                color: const Color(0xFFFCA5A5),
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
               ),
             ),
-          ),
-          const SizedBox(height: 14),
-          Text(
-            agenda.title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
-              height: 1.35,
+            const SizedBox(height: 6),
+            Container(
+              height: 1,
+              color: Colors.white.withOpacity(0.15),
             ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            agenda.description ?? '',
-            style: const TextStyle(
-              color: Color(0xFFFDE8E8),
-              height: 1.55,
-              fontSize: 13.5,
-            ),
-          ),
-          const SizedBox(height: 18),
-          Row(
-            children: <Widget>[
-              StatChip(icon: Icons.favorite_border, label: '${agenda.likesCount} Likes'),
-              const SizedBox(width: 10),
-              StatChip(
-                icon: Icons.chat_bubble_outline,
-                label: '${agenda.commentsCount ?? 0} Komentar',
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          const Row(
-            children: <Widget>[
-              Icon(Icons.chevron_right, color: Colors.white),
-              SizedBox(width: 6),
-              Text(
-                'Lihat detail agenda',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
+            const SizedBox(height: 16),
+
+            // Thumbnail image if available
+            if (agenda.hasImage && agenda.imageUrl != null) ...[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  agenda.imageUrl!,
+                  height: 140,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      height: 140,
+                      width: double.infinity,
+                      color: Colors.white.withOpacity(0.1),
+                      child: Center(
+                        child: Icon(Icons.broken_image_outlined,
+                            size: 32, color: Colors.white.withOpacity(0.5)),
+                      ),
+                    );
+                  },
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      height: 140,
+                      width: double.infinity,
+                      color: Colors.white.withOpacity(0.1),
+                      child: const Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
+              const SizedBox(height: 16),
             ],
-          ),
-        ],
+
+            // Title
+            Text(
+              agenda.title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            // Description
+            Text(
+              agenda.description ?? '',
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.8),
+                fontSize: 13,
+                height: 1.6,
+              ),
+            ),
+            const SizedBox(height: 18),
+
+            // Stats
+            Row(
+              children: [
+                const Icon(Icons.favorite_border, size: 16, color: Color(0xFFFCA5A5)),
+                const SizedBox(width: 4),
+                Text(
+                  '${agenda.likesCount} Likes',
+                  style: const TextStyle(
+                    color: Color(0xFFFCA5A5),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                const Icon(Icons.chat_bubble_outline, size: 16, color: Color(0xFFFCA5A5)),
+                const SizedBox(width: 4),
+                Text(
+                  '${agenda.commentsCount ?? 0} Komentar',
+                  style: const TextStyle(
+                    color: Color(0xFFFCA5A5),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

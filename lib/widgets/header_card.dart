@@ -18,114 +18,106 @@ class HeaderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: <Color>[Color(0xFF7F1D1D), Color(0xFFDC2626)],
+        color: Colors.white.withOpacity(0.94),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFFDC2626).withOpacity(0.12),
         ),
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: <BoxShadow>[
+        boxShadow: [
           BoxShadow(
-            color: Colors.red.shade200.withValues(alpha: 0.45),
-            blurRadius: 24,
-            offset: const Offset(0, 14),
+            color: const Color(0xFFB91C1C).withOpacity(0.10),
+            blurRadius: 35,
+            offset: const Offset(0, 15),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
-            ),
-            child: const Text(
-              'Talkyu Mobile',
-              style: TextStyle(
+        children: [
+          // Welcome title with gradient
+          ShaderMask(
+            shaderCallback: (bounds) => const LinearGradient(
+              colors: [Color(0xFFB91C1C), Color(0xFFEF4444)],
+            ).createShader(bounds),
+            child: Text(
+              'Selamat Datang, $name!',
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
                 color: Colors.white,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.3,
               ),
             ),
           ),
-          const SizedBox(height: 18),
-          const Text(
-            'Selamat Datang,',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 8),
           Text(
-            name,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.w800,
-              height: 1.1,
-            ),
-          ),
-          const SizedBox(height: 12),
-          const Text(
-            'Pantau agenda terbaru, kirim aduan, dan ikuti aspirasi kampus dari satu layar.',
+            'Anda berada di beranda utama Talkyu. Pantau informasi, agenda terbaru, serta kirim pengaduan dan aspirasi Anda di sini.',
             style: TextStyle(
-              color: Color(0xFFFDE8E8),
-              height: 1.55,
+              color: const Color(0xFF7F1D1D).withOpacity(0.78),
+              fontSize: 14,
+              height: 1.6,
             ),
           ),
-          const SizedBox(height: 18),
-          _IdentityRow(label: 'NIM', value: nim),
-          const SizedBox(height: 10),
-          _IdentityRow(label: 'Jurusan', value: jurusan),
-          const SizedBox(height: 10),
-          _IdentityRow(label: 'Program Studi', value: prodi),
+          const SizedBox(height: 24),
+          // User info grid (mirip web: 3 kolom)
+          Row(
+            children: [
+              Expanded(child: _InfoCard(label: 'NIM', value: nim)),
+              const SizedBox(width: 12),
+              Expanded(child: _InfoCard(label: 'Fakultas / Jurusan', value: jurusan)),
+              const SizedBox(width: 12),
+              Expanded(child: _InfoCard(label: 'Program Studi', value: prodi)),
+            ],
+          ),
         ],
       ),
     );
   }
 }
 
-class _IdentityRow extends StatelessWidget {
-  const _IdentityRow({required this.label, required this.value});
+class _InfoCard extends StatelessWidget {
+  const _InfoCard({required this.label, required this.value});
 
   final String label;
   final String value;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        SizedBox(
-          width: 110,
-          child: Text(
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.98),
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+          color: const Color(0xFFDC2626).withOpacity(0.1),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
             label,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.82),
-              fontSize: 12,
-              letterSpacing: 0.5,
-              fontWeight: FontWeight.w700,
+            style: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFFDC2626),
+              letterSpacing: 1,
             ),
           ),
-        ),
-        Expanded(
-          child: Text(
+          const SizedBox(height: 6),
+          Text(
             value,
             style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: FontWeight.w600,
+              color: Color(0xFF7F1D1D),
             ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

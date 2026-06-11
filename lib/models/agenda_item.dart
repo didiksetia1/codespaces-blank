@@ -8,6 +8,8 @@ class AgendaItem {
     this.commentsCount,
     this.description,
     this.hasImage = false,
+    this.imageUrl,
+    this.id,
     this.accent = const Color(0xFFB91C1C),
   });
 
@@ -17,5 +19,7 @@ class AgendaItem {
   final int? commentsCount;
   final String? description;
   final bool hasImage;
+  final String? imageUrl;
+  final String? id;
   final Color accent;
 }

@@ -87,6 +87,11 @@ class SanctumAuthService {
     return _client.get(_uri(path), headers: await _jsonHeaders(auth: auth));
   }
 
+  // Public getter for API calls from pages
+  Future<http.Response> getApi(String path, {bool auth = false}) async {
+    return _get(path, auth: auth);
+  }
+
   Future<http.Response> _post(
     String path,
     Map<String, dynamic> payload, {

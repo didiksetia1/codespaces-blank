@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/aspirasi.dart';
 import '../services/aspirasi_service.dart';
+import '../services/auth_service_sanctum.dart';
 
 class AspirasiDetailPage extends StatefulWidget {
   const AspirasiDetailPage({
@@ -339,52 +340,166 @@ class _AspirasiDetailPageState extends State<AspirasiDetailPage> {
           // Lampiran
           if (aspirasi.lampiran != null && aspirasi.lampiran!.isNotEmpty) ...[
             const SizedBox(height: 20),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: const Color(0xFFD1D5DB),
-                  style: BorderStyle.solid,
-                ),
-                borderRadius: BorderRadius.circular(8),
-                color: const Color(0xFFFDFCFC),
+            const Text(
+              'Lampiran',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1F2937),
+                fontSize: 15,
               ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.attach_file,
-                    size: 18,
-                    color: Color(0xFF6B7280),
-                  ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'Lampiran Tersedia',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF1F2937),
-                      fontSize: 14,
-                    ),
-                  ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Lampiran: ${aspirasi.lampiran}'),
+            ),
+            const SizedBox(height: 8),
+            Builder(
+              builder: (context) {
+                final lampiran = aspirasi.lampiran!;
+                final isImage = lampiran.toLowerCase().endsWith('.jpg') ||
+                    lampiran.toLowerCase().endsWith('.jpeg') ||
+                    lampiran.toLowerCase().endsWith('.png') ||
+                    lampiran.toLowerCase().endsWith('.gif') ||
+                    lampiran.toLowerCase().endsWith('.webp');
+                final imageUrl = lampiran.startsWith('http')
+                    ? lampiran
+                    : '${SanctumAuthService.apiBaseUrl}/storage/$lampiran';
+
+                if (isImage) {
+                  return GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => Dialog(
+                          backgroundColor: Colors.transparent,
+                          child: GestureDetector(
+                            onTap: () => Navigator.of(context).pop(),
+                            child: InteractiveViewer(
+                              child: Image.network(
+                                imageUrl,
+                                fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: Colors.black87,
+                                    padding: const EdgeInsets.all(20),
+                                    child: const Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.broken_image_outlined,
+                                            size: 48, color: Colors.white70),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          'Gagal memuat gambar',
+                                          style: TextStyle(
+                                              color: Colors.white70),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
                         ),
                       );
                     },
-                    child: const Text(
-                      'Lihat File',
-                      style: TextStyle(
-                        color: Color(0xFFB91C1C),
-                        fontWeight: FontWeight.w600,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        imageUrl,
+                        width: double.infinity,
+                        height: 200,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: double.infinity,
+                            height: 120,
+                            color: const Color(0xFFF3F4F6),
+                            child: const Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.broken_image_outlined,
+                                    size: 36, color: Color(0xFF9CA3AF)),
+                                SizedBox(height: 4),
+                                Text(
+                                  'Gagal memuat gambar',
+                                  style: TextStyle(
+                                    color: Color(0xFF6B7280),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            width: double.infinity,
+                            height: 200,
+                            color: const Color(0xFFF3F4F6),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes !=
+                                        null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                    : null,
+                                color: const Color(0xFFB91C1C),
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
+                  );
+                }
+
+                // Non-image file: show link
+                return Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: const Color(0xFFD1D5DB),
+                      style: BorderStyle.solid,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                    color: const Color(0xFFFDFCFC),
                   ),
-                ],
-              ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.attach_file,
+                        size: 18,
+                        color: Color(0xFF6B7280),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Lampiran Tersedia',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF1F2937),
+                          fontSize: 14,
+                        ),
+                      ),
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Lampiran: $imageUrl'),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          'Lihat File',
+                          style: TextStyle(
+                            color: Color(0xFFB91C1C),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ],
 
