@@ -5,9 +5,11 @@ import 'pages/aduan_history_page.dart';
 import 'pages/aduan_hub_page.dart';
 import 'pages/agenda_page.dart';
 import 'pages/aspirasi_page.dart';
+import 'pages/forgot_password_page.dart';
 import 'pages/home_page.dart';
 import 'pages/login_page.dart';
 import 'pages/register_page.dart';
+import 'pages/reset_password_page.dart';
 import 'pages/aspirasi_detail_page.dart';
 
 void main() {
@@ -35,6 +37,7 @@ class MyApp extends StatelessWidget {
       home: switch (previewPage) {
         'login' => const LoginPage(),
         'register' => const RegisterPage(),
+        'forgot-password' => const ForgotPasswordPage(),
         'aduan' => const AduanHubPage(),
         'aduan-baru' => const AduanCreatePage(),
         'aduan-riwayat' => const AduanHistoryPage(),
@@ -47,6 +50,8 @@ class MyApp extends StatelessWidget {
         LoginPage.routeName: (BuildContext context) => const LoginPage(),
         HomePage.routeName: (BuildContext context) => const HomePage(),
         RegisterPage.routeName: (BuildContext context) => const RegisterPage(),
+        ForgotPasswordPage.routeName: (BuildContext context) => const ForgotPasswordPage(),
+        ResetPasswordPage.routeName: (BuildContext context) => const ResetPasswordPage(),
         AduanHubPage.routeName: (BuildContext context) => const AduanHubPage(),
         AduanCreatePage.routeName: (BuildContext context) => const AduanCreatePage(),
         AduanHistoryPage.routeName: (BuildContext context) => const AduanHistoryPage(),

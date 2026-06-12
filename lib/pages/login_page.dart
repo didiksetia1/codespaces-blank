@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'register_page.dart';
+import 'forgot_password_page.dart';
 import 'home_page.dart';
 import '../services/auth_service_sanctum.dart';
 
@@ -189,7 +190,8 @@ class _LoginPageState extends State<LoginPage> {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () {
-                        // Handle forgot password
+                        Navigator.of(context)
+                            .pushNamed(ForgotPasswordPage.routeName);
                       },
                       child: const Text(
                         'Lupa Password?',

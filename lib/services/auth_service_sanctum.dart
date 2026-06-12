@@ -140,6 +140,7 @@ class SanctumAuthService {
   Future<bool> register({
     required String nim,
     required String name,
+    required String email,
     required String password,
     String? faculty,
     String? program,
@@ -148,6 +149,7 @@ class SanctumAuthService {
       final response = await _post('/api/register', {
         'nama': name,
         'nim': nim,
+        'email': email,
         'jurusan': faculty ?? '',
         'prodi': program ?? '',
         'password': password,
@@ -158,6 +160,42 @@ class SanctumAuthService {
     } catch (e) {
       // ignore: avoid_print
       print('Register failed: $e');
+      return false;
+    }
+  }
+
+  /// Kirim request forgot password. Input: email.
+  /// Returns true jika request terkirim (atau email tidak ditemukan - sama-sama return sukses).
+  Future<bool> forgotPassword(String email) async {
+    try {
+      final response = await _post('/api/forgot-password', {
+        'email': email,
+      });
+      return response.statusCode >= 200 && response.statusCode < 300;
+    } catch (e) {
+      // ignore: avoid_print
+      print('Forgot password failed: $e');
+      return false;
+    }
+  }
+
+  /// Reset password dengan token.
+  Future<bool> resetPassword({
+    required String email,
+    required String token,
+    required String password,
+  }) async {
+    try {
+      final response = await _post('/api/reset-password', {
+        'email': email,
+        'token': token,
+        'password': password,
+        'password_confirmation': password,
+      });
+      return response.statusCode >= 200 && response.statusCode < 300;
+    } catch (e) {
+      // ignore: avoid_print
+      print('Reset password failed: $e');
       return false;
     }
   }

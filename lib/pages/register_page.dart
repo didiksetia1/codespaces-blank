@@ -14,6 +14,7 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _nimController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
@@ -60,6 +61,7 @@ class _RegisterPageState extends State<RegisterPage> {
   void dispose() {
     _nameController.dispose();
     _nimController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -94,6 +96,7 @@ class _RegisterPageState extends State<RegisterPage> {
       final success = await _sanctum.register(
         nim: _nimController.text.trim(),
         name: _nameController.text.trim(),
+        email: _emailController.text.trim(),
         password: _passwordController.text,
         faculty: _selectedFakultas,
         program: _selectedProdi,
@@ -238,6 +241,20 @@ class _RegisterPageState extends State<RegisterPage> {
                                 icon: Icons.badge_outlined,
                                 validator: (v) =>
                                     v!.isEmpty ? 'NIM wajib diisi' : null,
+                              ),
+                              const SizedBox(height: 16),
+
+                              // Email
+                              _buildInputField(
+                                controller: _emailController,
+                                hint: 'Email',
+                                icon: Icons.email_outlined,
+                                keyboardType: TextInputType.emailAddress,
+                                validator: (v) {
+                                  if (v!.isEmpty) return 'Email wajib diisi';
+                                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(v)) return 'Format email tidak valid';
+                                  return null;
+                                },
                               ),
                               const SizedBox(height: 16),
 
@@ -409,11 +426,13 @@ class _RegisterPageState extends State<RegisterPage> {
     bool obscure = false,
     Widget? suffixIcon,
     String? Function(String?)? validator,
+    TextInputType? keyboardType,
   }) {
     return TextFormField(
       controller: controller,
       obscureText: obscure,
       validator: validator,
+      keyboardType: keyboardType,
       style: const TextStyle(
         fontSize: 15,
         color: Color(0xFF7F1D1D),
