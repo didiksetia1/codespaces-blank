@@ -75,37 +75,40 @@ class AduanHubPage extends StatelessWidget {
               builder: (BuildContext context, BoxConstraints constraints) {
                 final bool wide = constraints.maxWidth >= 760;
 
-                final List<Widget> cards = <Widget>[
-                  Expanded(
-                    child: HubChoiceCard(
-                      icon: Icons.add,
-                      title: 'Buat Aduan Baru',
-                      description:
-                          'Sampaikan keluhan, kritik, atau saran terkait perkuliahan dan administrasi akademik.',
-                      onTap: () => Navigator.of(context).pushNamed(AduanCreatePage.routeName),
-                    ),
-                  ),
-                  const SizedBox(width: 18, height: 18),
-                  Expanded(
-                    child: HubChoiceCard(
-                      icon: Icons.access_time,
-                      title: 'Riwayat Aduan Saya',
-                      description:
-                          'Pantau status perkembangan dan penyelesaian dari aduan-aduan yang telah Anda kirimkan.',
-                      onTap: () => Navigator.of(context).pushNamed(AduanHistoryPage.routeName),
-                    ),
-                  ),
-                ];
+                // 1. DI SINI PERUBAHANNYA: Hapus bungkus Expanded bawaan agar aman saat masuk Column
+                final Widget cardCreate = HubChoiceCard(
+                  icon: Icons.add,
+                  title: 'Buat Aduan Baru',
+                  description:
+                      'Sampaikan keluhan, kritik, atau saran terkait perkuliahan dan administrasi akademik.',
+                  onTap: () => Navigator.of(context).pushNamed(AduanCreatePage.routeName),
+                );
 
+                final Widget cardHistory = HubChoiceCard(
+                  icon: Icons.access_time,
+                  title: 'Riwayat Aduan Saya',
+                  description:
+                      'Pantau status perkembangan dan penyelesaian dari aduan-aduan yang telah Anda kirimkan.',
+                  onTap: () => Navigator.of(context).pushNamed(AduanHistoryPage.routeName),
+                );
+
+                // 2. Jika layar lebar (Tablet/Web), bungkus dengan Expanded di dalam Row
                 if (wide) {
-                  return Row(children: cards);
+                  return Row(
+                    children: <Widget>[
+                      Expanded(child: cardCreate),
+                      const SizedBox(width: 18),
+                      Expanded(child: cardHistory),
+                    ],
+                  );
                 }
 
+                // 3. Jika layar HP biasa, langsung return Column tanpa Expanded
                 return Column(
                   children: <Widget>[
-                    cards[0],
+                    cardCreate,
                     const SizedBox(height: 18),
-                    cards[2],
+                    cardHistory,
                   ],
                 );
               },

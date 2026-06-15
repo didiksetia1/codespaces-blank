@@ -17,7 +17,6 @@ class ComplaintHistoryDetail extends StatelessWidget {
     ];
 
     return Container(
-      height: 360,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -141,7 +140,7 @@ class ComplaintHistoryDetail extends StatelessWidget {
               ),
             ),
           ],
-          const Spacer(),
+          const SizedBox(height: 24),
           Text(
             'Dikirim pada: ${entry.createdAtLabel}',
             style: const TextStyle(
@@ -208,8 +207,8 @@ class _TimelineRow extends StatelessWidget {
                 width: 2,
                 height: 24,
                 color: active
-                    ? activeColor.withValues(alpha: 0.45)
-                    : inactiveColor.withValues(alpha: 0.55),
+                    ? activeColor.withOpacity(0.45)
+                    : inactiveColor.withOpacity(0.55),
               ),
           ],
         ),

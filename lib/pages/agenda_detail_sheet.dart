@@ -5,7 +5,12 @@ import '../services/agenda_service.dart';
 import '../widgets/agenda_states.dart';
 
 class AgendaDetailSheet extends StatefulWidget {
-  const AgendaDetailSheet({required this.agendaService, required this.agenda, required this.onChanged, super.key});
+  const AgendaDetailSheet({
+    required this.agendaService, 
+    required this.agenda, 
+    required this.onChanged, 
+    super.key,
+  });
 
   final AgendaService agendaService;
   final Agenda agenda;
@@ -205,7 +210,95 @@ class _AgendaDetailSheetState extends State<AgendaDetailSheet> {
                             height: 1.4,
                           ),
                         ),
+                        const SizedBox(height: 24),
+                        const Divider(color: Color(0xFFE5E7EB)),
+                        const SizedBox(height: 16),
+
+                        // --- 1. FIELD INPUT MENULIS KOMENTAR (DI ATAS SEKARANG) ---
+                        Text(
+                          'Komentar (${_agenda.daftarKomentar.length})',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF7F1D1D),
+                          ),
+                        ),
                         const SizedBox(height: 12),
+                        TextField(
+                          controller: _commentController,
+                          maxLines: 3,
+                          decoration: InputDecoration(
+                            hintText: 'Tulis komentar Anda di sini...',
+                            hintStyle: const TextStyle(
+                              color: Color(0xFFD1D5DB),
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(6),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFE5E7EB),
+                              ),
+                            ),
+                            contentPadding: const EdgeInsets.all(12),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFC41C1C),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ),
+                            onPressed: _submittingComment ? null : _sendComment,
+                            child: _submittingComment
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                    ),
+                                  )
+                                : const Text(
+                                    'Kirim Komentar',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        const Divider(color: Color(0xFFE5E7EB)),
+                        const SizedBox(height: 16),
+
+                        // --- 2. TEKS DESKRIPSI UTAMA (Di bawah tombol Kirim Komentar) ---
+                        const Text(
+                          'Deskripsi Agenda:',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF7F1D1D),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _agenda.deskripsi.isNotEmpty ? _agenda.deskripsi : 'Tidak ada deskripsi.',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            height: 1.6,
+                            color: Color(0xFF4B5563),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        const Divider(color: Color(0xFFE5E7EB)),
+                        const SizedBox(height: 16),
+
+                        // --- 3. TANGGAL AGENDA ---
                         Row(
                           children: <Widget>[
                             const Icon(
@@ -224,15 +317,8 @@ class _AgendaDetailSheetState extends State<AgendaDetailSheet> {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        Text(
-                          _agenda.deskripsi.isNotEmpty ? _agenda.deskripsi : 'Tidak ada deskripsi.',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            height: 1.6,
-                            color: Color(0xFF4B5563),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
+                        
+                        // --- 4. TOMBOL SUKA DAN JUMLAH KOMENTAR ---
                         Row(
                           children: <Widget>[
                             Expanded(
@@ -297,129 +383,65 @@ class _AgendaDetailSheetState extends State<AgendaDetailSheet> {
                           ],
                         ),
                         const SizedBox(height: 24),
-                        Text(
-                          'Komentar (${_agenda.daftarKomentar.length})',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF7F1D1D),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        TextField(
-                          controller: _commentController,
-                          maxLines: 3,
-                          decoration: InputDecoration(
-                            hintText: 'Tulis komentar Anda di sini...',
-                            hintStyle: const TextStyle(
-                              color: Color(0xFFD1D5DB),
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(6),
-                              borderSide: const BorderSide(
-                                color: Color(0xFFE5E7EB),
-                              ),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 12,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFC41C1C),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                            ),
-                            onPressed: _submittingComment ? null : _sendComment,
-                            child: _submittingComment
-                                ? const SizedBox(
-                                    width: 18,
-                                    height: 18,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                    ),
-                                  )
-                                : const Text(
-                                    'Kirim Komentar',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
+                        const Divider(color: Color(0xFFE5E7EB)),
+                        const SizedBox(height: 16),
+
+                        // --- 5. DAFTAR LIST KOMENTAR USER ---
+                        if (_agenda.daftarKomentar.isNotEmpty)
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: _agenda.daftarKomentar.length,
+                            itemBuilder: (context, index) {
+                              final komentar = _agenda.daftarKomentar[index];
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(
+                                      color: const Color(0xFFE5E7EB),
                                     ),
                                   ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        if (_agenda.daftarKomentar.isNotEmpty)
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              const Divider(color: Color(0xFFE5E7EB)),
-                              const SizedBox(height: 12),
-                              ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: _agenda.daftarKomentar.length,
-                                itemBuilder: (context, index) {
-                                  final komentar = _agenda.daftarKomentar[index];
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 16),
-                                    child: Container(
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(6),
-                                        border: Border.all(
-                                          color: const Color(0xFFE5E7EB),
-                                        ),
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: <Widget>[
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: <Widget>[
-                                              Text(
-                                                komentar.nama,
-                                                style: const TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Color(0xFF1F2937),
-                                                ),
-                                              ),
-                                              Text(
-                                                komentar.formatTanggal,
-                                                style: const TextStyle(
-                                                  fontSize: 10,
-                                                  color: Color(0xFF9CA3AF),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 6),
                                           Text(
-                                            komentar.isi,
+                                            komentar.nama,
                                             style: const TextStyle(
                                               fontSize: 12,
-                                              color: Color(0xFF4B5563),
-                                              height: 1.5,
+                                              fontWeight: FontWeight.w700,
+                                              color: Color(0xFF1F2937),
+                                            ),
+                                          ),
+                                          Text(
+                                            komentar.formatTanggal,
+                                            style: const TextStyle(
+                                              fontSize: 10,
+                                              color: Color(0xFF9CA3AF),
                                             ),
                                           ),
                                         ],
                                       ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        komentar.isi,
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: Color(0xFF4B5563),
+                                          height: 1.5,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         const SizedBox(height: 20),
                       ],

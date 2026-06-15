@@ -532,7 +532,7 @@ class _AspirasiDetailPageState extends State<AspirasiDetailPage> {
                         size: 18,
                         color: Color(0xFF065F46),
                       ),
-                      SizedBox(width: 6),
+                      const SizedBox(width: 6),
                       Text(
                         'Tanggapan BEM:',
                         style: TextStyle(
@@ -634,13 +634,9 @@ class _AspirasiDetailPageState extends State<AspirasiDetailPage> {
           ),
           const SizedBox(height: 20),
 
-          // Comment Form
-          _buildCommentForm(),
-          const SizedBox(height: 20),
-          const Divider(color: Color(0xFFE5E7EB)),
-          const SizedBox(height: 12),
-
-          // Comments List
+          // ==========================================
+          // POSISI PINDAH: Daftar Komentar naik ke atas
+          // ==========================================
           if (_comments.isEmpty)
             Center(
               child: Padding(
@@ -680,6 +676,14 @@ class _AspirasiDetailPageState extends State<AspirasiDetailPage> {
                 return _buildCommentItem(comment);
               },
             ),
+
+          // ==========================================
+          // POSISI PINDAH: Form Ketik & Tombol Kirim pindah ke bawah
+          // ==========================================
+          const SizedBox(height: 20),
+          const Divider(color: Color(0xFFE5E7EB)),
+          const SizedBox(height: 12),
+          _buildCommentForm(),
         ],
       ),
     );
