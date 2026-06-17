@@ -63,11 +63,8 @@ class _AgendaDetailSheetState extends State<AgendaDetailSheet> {
   Future<void> _toggleLike() async {
     setState(() => _submittingLike = true);
     try {
-      final updated = await widget.agendaService.toggleLike(_agenda.id);
-      if (!mounted) return;
-      setState(() {
-        _agenda = updated;
-      });
+      await widget.agendaService.toggleLike(_agenda.id);
+      await _loadDetail();
       await widget.onChanged();
     } catch (e) {
       if (!mounted) return;
@@ -96,6 +93,8 @@ class _AgendaDetailSheetState extends State<AgendaDetailSheet> {
         _agenda = updated;
         _commentController.clear();
       });
+      // Amankan pemanggilan loadDetail setelah kirim komentar agar jumlah list ikut terupdate rapi
+      await _loadDetail();
       await widget.onChanged();
     } catch (e) {
       if (!mounted) return;
@@ -214,7 +213,7 @@ class _AgendaDetailSheetState extends State<AgendaDetailSheet> {
                         const Divider(color: Color(0xFFE5E7EB)),
                         const SizedBox(height: 16),
 
-                        // --- 1. FIELD INPUT MENULIS KOMENTAR (DI ATAS SEKARANG) ---
+                        // --- FIELD INPUT MENULIS KOMENTAR ---
                         Text(
                           'Komentar (${_agenda.daftarKomentar.length})',
                           style: const TextStyle(
@@ -276,7 +275,7 @@ class _AgendaDetailSheetState extends State<AgendaDetailSheet> {
                         const Divider(color: Color(0xFFE5E7EB)),
                         const SizedBox(height: 16),
 
-                        // --- 2. TEKS DESKRIPSI UTAMA (Di bawah tombol Kirim Komentar) ---
+                        // --- TEKS DESKRIPSI UTAMA ---
                         const Text(
                           'Deskripsi Agenda:',
                           style: TextStyle(
@@ -298,7 +297,7 @@ class _AgendaDetailSheetState extends State<AgendaDetailSheet> {
                         const Divider(color: Color(0xFFE5E7EB)),
                         const SizedBox(height: 16),
 
-                        // --- 3. TANGGAL AGENDA ---
+                        // --- TANGGAL AGENDA ---
                         Row(
                           children: <Widget>[
                             const Icon(
@@ -318,7 +317,7 @@ class _AgendaDetailSheetState extends State<AgendaDetailSheet> {
                         ),
                         const SizedBox(height: 16),
                         
-                        // --- 4. TOMBOL SUKA DAN JUMLAH KOMENTAR ---
+                        // --- TOMBOL SUKA DAN JUMLAH KOMENTAR ---
                         Row(
                           children: <Widget>[
                             Expanded(
@@ -368,8 +367,10 @@ class _AgendaDetailSheetState extends State<AgendaDetailSheet> {
                                       color: Color(0xFF8A4A4A),
                                     ),
                                     const SizedBox(width: 6),
+                                    
+                                    // --- PERBAIKAN DI ATASI DI SINI ---
                                     Text(
-                                      '${_agenda.comments} Komentar',
+                                      '${_agenda.daftarKomentar.length} Komentar',
                                       style: const TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
@@ -386,7 +387,7 @@ class _AgendaDetailSheetState extends State<AgendaDetailSheet> {
                         const Divider(color: Color(0xFFE5E7EB)),
                         const SizedBox(height: 16),
 
-                        // --- 5. DAFTAR LIST KOMENTAR USER ---
+                        // --- DAFTAR LIST KOMENTAR USER ---
                         if (_agenda.daftarKomentar.isNotEmpty)
                           ListView.builder(
                             shrinkWrap: true,
