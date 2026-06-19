@@ -87,20 +87,24 @@ class _AgendaDetailSheetState extends State<AgendaDetailSheet> {
 
     setState(() => _submittingComment = true);
     try {
-      final updated = await widget.agendaService.comment(_agenda.id, message);
+      // 1. Kirim komentar ke server Laravel via API
+      await widget.agendaService.comment(_agenda.id, message);
+      
       if (!mounted) return;
-      setState(() {
-        _agenda = updated;
-        _commentController.clear();
-      });
-      // Amankan pemanggilan loadDetail setelah kirim komentar agar jumlah list ikut terupdate rapi
+      
+      // 2. Bersihkan input field jika pengiriman sukses
+      _commentController.clear();
+
+      // 3. Ambil data Agenda dan List Komentar yang utuh dan fresh dari database
       await _loadDetail();
+      
+      // 4. Trigger callback halaman utama agar list luarnya ikut terupdate
       await widget.onChanged();
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(e.toString()),
+          content: Text('Gagal mengirim komentar: ${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
@@ -367,8 +371,6 @@ class _AgendaDetailSheetState extends State<AgendaDetailSheet> {
                                       color: Color(0xFF8A4A4A),
                                     ),
                                     const SizedBox(width: 6),
-                                    
-                                    // --- PERBAIKAN DI ATASI DI SINI ---
                                     Text(
                                       '${_agenda.daftarKomentar.length} Komentar',
                                       style: const TextStyle(
