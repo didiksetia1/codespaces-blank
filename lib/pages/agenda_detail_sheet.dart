@@ -27,6 +27,7 @@ class _AgendaDetailSheetState extends State<AgendaDetailSheet> {
   bool _submittingLike = false;
   bool _submittingComment = false;
   String? _errorMessage;
+  String? _validationMessage; // Menampung pesan pelanggaran kata kasar dari AI
 
   @override
   void initState() {
@@ -85,29 +86,47 @@ class _AgendaDetailSheetState extends State<AgendaDetailSheet> {
     final message = _commentController.text.trim();
     if (message.isEmpty) return;
 
-    setState(() => _submittingComment = true);
+    setState(() {
+      _submittingComment = true;
+      _validationMessage = null; // Reset info pelanggaran sebelum mengirim ulang
+    });
+    
     try {
-      // 1. Kirim komentar ke server Laravel via API
+      // 1. Kirim komentar ke backend Laravel via API
       await widget.agendaService.comment(_agenda.id, message);
       
       if (!mounted) return;
       
-      // 2. Bersihkan input field jika pengiriman sukses
+      // 2. Bersihkan field teks jika komentar lolos filter AI dan masuk database
       _commentController.clear();
 
-      // 3. Ambil data Agenda dan List Komentar yang utuh dan fresh dari database
+      // 3. Muat ulang data daftar komentar terbaru
       await _loadDetail();
       
-      // 4. Trigger callback halaman utama agar list luarnya ikut terupdate
+      // 4. Sinkronisasi perubahan jumlah komentar ke widget halaman list utama
       await widget.onChanged();
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Gagal mengirim komentar: ${e.toString()}'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      
+      final errorStr = e.toString().toLowerCase();
+      
+      // Deteksi jika respon error bersumber dari validasi kata kasar/spam AI Laravel
+      if (errorStr.contains('spam') || 
+          errorStr.contains('pantas') || 
+          errorStr.contains('kasar') || 
+          errorStr.contains('422')) {
+        setState(() {
+          _validationMessage = '⚠️ Sistem AI mendeteksi komentar Anda terindikasi spam atau mengandung kata-kata yang tidak pantas.';
+        });
+      } else {
+        // Jika error jaringan biasa atau kegagalan sistem umum lainnya
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gagal mengirim komentar: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } finally {
       if (mounted) {
         setState(() => _submittingComment = false);
@@ -227,6 +246,32 @@ class _AgendaDetailSheetState extends State<AgendaDetailSheet> {
                           ),
                         ),
                         const SizedBox(height: 12),
+
+                        // Banner Notifikasi Pelanggaran AI (Berdasarkan image_4a683b.png)
+                        if (_validationMessage != null) ...[
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFEE2E2), // Background merah muda pastel murni
+                              border: Border.all(
+                                color: const Color(0xFFFCA5A5), // Garis tepi merah pudar halus
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              _validationMessage!,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFFDC2626), // Teks merah terang penanda warning
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                        ],
+
                         TextField(
                           controller: _commentController,
                           maxLines: 3,

@@ -63,6 +63,34 @@ class AgendaService {
     return null;
   }
 
+  // --- STRATEGI PARSING PESAN ERROR DARI BACKEND LARAVEL ---
+  String _decodeMessage(http.Response response) {
+    try {
+      final dynamic decoded = jsonDecode(response.body);
+      if (decoded is Map<String, dynamic>) {
+        final message = decoded['message'];
+        if (message is String && message.trim().isNotEmpty) {
+          return message.trim();
+        }
+
+        final errors = decoded['errors'];
+        if (errors is Map<String, dynamic>) {
+          for (final value in errors.values) {
+            if (value is List && value.isNotEmpty && value.first is String) {
+              return value.first as String;
+            }
+          }
+        }
+      }
+    } catch (_) {
+      // Abaikan jika bukan format JSON valid
+    }
+
+    final trimmed = response.body.trim();
+    if (trimmed.isNotEmpty) return trimmed;
+    return 'HTTP ${response.statusCode}';
+  }
+
   Future<List<Agenda>> fetchAgendas() async {
     final response = await _client.get(
       _uri('/api/agenda'),
@@ -104,7 +132,7 @@ class AgendaService {
     );
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception('Gagal memperbarui like (${response.statusCode})');
+      throw Exception(_decodeMessage(response));
     }
 
     final data = await _decodeBody(response);
@@ -116,6 +144,7 @@ class AgendaService {
     return fetchAgenda(id);
   }
 
+  // --- UPDATE PADA FUNGSI COMMENT UNTUK MENERUSKAN PESAN VALIDASI AI ---
   Future<Agenda> comment(String id, String message) async {
     final response = await _client.post(
       _uri('/api/agenda/$id/comment'),
@@ -129,7 +158,8 @@ class AgendaService {
     );
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception('Gagal mengirim komentar (${response.statusCode})');
+      // Sekarang melempar isi object error asli dari Laravel (misal berisi info kata kasar/spam)
+      throw Exception(_decodeMessage(response));
     }
 
     final data = await _decodeBody(response);
